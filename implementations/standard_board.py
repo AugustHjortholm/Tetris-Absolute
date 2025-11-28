@@ -91,13 +91,18 @@ class StandardBoard(IBoard):
     
     def clear_rows(self, rows: List[int]) -> None:
         """Clear the specified rows and move rows above down"""
+        if not rows:
+            return
+        
         # Sort rows in descending order to avoid index shifting issues
         sorted_rows = sorted(rows, reverse=True)
         
+        # Remove all the full rows
         for row in sorted_rows:
-            # Remove the row
             del self._grid[row]
-            # Add an empty row at the top
+        
+        # Add the same number of empty rows at the top
+        for _ in range(len(rows)):
             self._grid.insert(0, [None for _ in range(self._width)])
     
     def clear(self) -> None:

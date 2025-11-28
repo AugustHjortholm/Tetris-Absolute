@@ -69,6 +69,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Testing
+
+Run the unit test suite:
+
+```bash
+pytest tests/ -v
+```
+
+All 52 tests should pass. See `tests/README.md` for more details.
+
 ## Running the Game
 
 ```bash
