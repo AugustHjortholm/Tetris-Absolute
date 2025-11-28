@@ -13,6 +13,7 @@ Rotate Clockwise    = Square (□)
 Rotate CCW          = Cross (✕)
 Soft Drop (hold)    = D-Pad Down
 Hard Drop (instant) = D-Pad Up
+Hold/Store Piece    = L1 or R1
 Pause               = Options
 Restart             = Share
 
@@ -20,8 +21,6 @@ ALTERNATIVE CONTROLS:
 ---------------------
 Move Left/Right     = Left Stick (Horizontal)
 Soft Drop           = Left Stick Down (hold)
-Rotate CCW          = L1
-Rotate Clockwise    = R1
 Pause               = Triangle (△)
 
 
@@ -33,6 +32,7 @@ Rotate Clockwise    = X
 Rotate CCW          = A
 Soft Drop (hold)    = D-Pad Down
 Hard Drop (instant) = D-Pad Up
+Hold/Store Piece    = LB or RB
 Pause               = Start
 Restart             = Back
 
@@ -40,8 +40,6 @@ ALTERNATIVE CONTROLS:
 ---------------------
 Move Left/Right     = Left Stick (Horizontal)
 Soft Drop           = Left Stick Down (hold)
-Rotate CCW          = LB
-Rotate Clockwise    = RB
 Pause               = Y
 
 
@@ -53,6 +51,7 @@ Rotate CCW          = A or Z
 Rotate Clockwise    = D
 Soft Drop (hold)    = Up Arrow
 Hard Drop (instant) = Down Arrow
+Hold/Store Piece    = C or Shift
 Pause               = P or Escape
 Restart             = R
 
@@ -61,6 +60,9 @@ NOTES:
 ======
 - Soft drop: Hold the button to make pieces fall faster continuously
 - Hard drop: Instantly drops the piece to the bottom
+- Hold/Store: Press once to store current piece (get next from queue)
+  Press again to swap current piece with stored piece
+  Can only use once per piece placement (resets when piece locks)
 - One press of Left/Right = One space of movement (no auto-repeat)
 - Rotation uses the Super Rotation System (SRS) with wall kicks
 - Controller is auto-detected on startup

@@ -3,7 +3,7 @@ Pygame-based renderer for the Tetris game.
 """
 
 import pygame
-from typing import Tuple
+from typing import Tuple, Optional
 from core.interfaces import IRenderer, IBoard, IPiece, IGameState
 
 
@@ -16,12 +16,16 @@ class PygameRenderer(IRenderer):
         self.use_controller = use_controller
         
         # Calculate layout
-        self.board_x = 20
+        # Board is centered with panels on left and right
+        self.hold_panel_x = 20  # Hold panel on far left
+        self.board_x = self.hold_panel_x + 180 + 20  # Board after hold panel
         self.board_y = 20
         
-        # Side panel position
+        # Side panel position (right side)
         self.panel_x = self.board_x + 10 * cell_size + 40
         self.panel_y = 20
+        
+        self.hold_panel_y = 20
         
         # Font setup
         pygame.font.init()
@@ -86,14 +90,34 @@ class PygameRenderer(IRenderer):
         self.screen.blit(label, (self.panel_x + 10, self.panel_y + 270))
         
         # Draw the piece centered in the panel
+        self._draw_piece_preview(piece, self.panel_x, self.panel_y + 320, 160, 120)
+    
+    def render_held_piece(self, piece: Optional[IPiece]) -> None:
+        """Render the held piece preview"""
+        # Draw panel background
+        panel_rect = pygame.Rect(self.hold_panel_x, self.hold_panel_y, 160, 160)
+        pygame.draw.rect(self.screen, self.panel_bg, panel_rect)
+        pygame.draw.rect(self.screen, self.grid_color, panel_rect, 2)
+        
+        # Draw "HOLD" label
+        label = self.font_small.render("HOLD (L1/R1)", True, (255, 215, 0))
+        self.screen.blit(label, (self.hold_panel_x + 10, self.hold_panel_y + 10))
+        
+        # Draw the piece if one is held
+        if piece is not None:
+            self._draw_piece_preview(piece, self.hold_panel_x, self.hold_panel_y + 40, 160, 120)
+    
+    def _draw_piece_preview(self, piece: IPiece, panel_x: int, panel_y: int, 
+                           panel_width: int, panel_height: int) -> None:
+        """Helper method to draw a piece preview in a panel"""
         shape = piece.shape
         small_cell_size = 25
         
         # Calculate centering offset
         piece_width = len(shape[0]) * small_cell_size
         piece_height = len(shape) * small_cell_size
-        offset_x = self.panel_x + (160 - piece_width) // 2
-        offset_y = self.panel_y + 320 + (120 - piece_height) // 2
+        offset_x = panel_x + (panel_width - piece_width) // 2
+        offset_y = panel_y + (panel_height - piece_height) // 2
         
         for row in range(len(shape)):
             for col in range(len(shape[row])):

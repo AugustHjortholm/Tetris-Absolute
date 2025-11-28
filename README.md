@@ -94,6 +94,7 @@ python main.py
 - **D** - Rotate clockwise
 - **↑** - Soft drop (hold for continuous drop)
 - **↓** - Hard drop (instant drop)
+- **C / Shift** - Hold/Store piece
 - **P** or **Escape** - Pause
 - **R** - Restart game
 
@@ -109,13 +110,17 @@ python main.py
 - **Cross (X) / A (Xbox)** - Rotate counter-clockwise
 - **D-Pad Down** - Soft drop (hold for continuous drop)
 - **D-Pad Up** - Hard drop (instant drop)
+- **L1 or R1 / LB or RB (Xbox)** - Hold/Store piece
 - **Options / Start / Triangle / Y** - Pause
 - **Share / Back** - Restart
 
 **Alternative Controls:**
 - **Left Stick** - Can be used for movement and soft drop
-- **L1 / LB** - Rotate counter-clockwise
-- **R1 / RB** - Rotate clockwise
+
+**Hold/Store Feature:**
+- Press once to store the current piece and get the next one from the queue
+- Press again to swap your current piece with the stored one
+- Can only be used once per piece placement (resets when the piece locks to the board)
 
 The game will automatically detect and use your controller if connected. Otherwise, it falls back to keyboard controls.
 

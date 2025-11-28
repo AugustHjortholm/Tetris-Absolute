@@ -87,6 +87,7 @@ class ControllerInputHandler(IInputHandler):
         self._rotate_right = False
         self._pause = False
         self._restart = False
+        self._hold = False
         
         # Continuous action
         self._soft_drop_held = False
@@ -108,6 +109,7 @@ class ControllerInputHandler(IInputHandler):
         self._rotate_right = False
         self._pause = False
         self._restart = False
+        self._hold = False
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -144,12 +146,13 @@ class ControllerInputHandler(IInputHandler):
                 elif button == self.PS_CROSS:
                     self._rotate_left = True
                 
-                # L1/R1 - alternative rotate buttons (kept for convenience)
+                # L1 - hold/store piece
                 elif button == self.PS_L1:
-                    self._rotate_left = True
+                    self._hold = True
                 
+                # R1 - also hold/store piece
                 elif button == self.PS_R1:
-                    self._rotate_right = True
+                    self._hold = True
                 
                 # Options - pause
                 elif button == self.PS_OPTIONS:
@@ -256,6 +259,10 @@ class ControllerInputHandler(IInputHandler):
     def should_restart(self) -> bool:
         """Check if should restart"""
         return self._restart
+    
+    def should_hold(self) -> bool:
+        """Check if should hold/store piece"""
+        return self._hold
     
     @staticmethod
     def is_controller_connected() -> bool:

@@ -19,8 +19,8 @@ def main():
     # Initialize Pygame
     pygame.init()
     
-    # Create window
-    window_width = 600
+    # Create window (wider to accommodate hold piece panel on left)
+    window_width = 780  # Extra space for hold panel
     window_height = 660
     screen = pygame.display.set_mode((window_width, window_height))
     pygame.display.set_caption("Tetris Roguelike")
@@ -71,9 +71,10 @@ def main():
         print("  Cross (X): Rotate counter-clockwise")
         print("  D-Pad Down: Soft drop (hold)")
         print("  D-Pad Up: Hard drop (instant)")
+        print("  L1 / R1: Hold/Store piece")
         print("  Options / Triangle: Pause")
         print("  Share: Restart")
-        print("\nAlternatives: Left Stick for movement, L1/R1 for rotation")
+        print("\nAlternatives: Left Stick for movement")
     else:
         print("Keyboard Controls:")
         print("  Left/Right Arrows: Move piece")
@@ -81,6 +82,7 @@ def main():
         print("  D: Rotate right")
         print("  Up Arrow: Soft drop (hold to continuously drop)")
         print("  Down Arrow: Hard drop (instant)")
+        print("  C/Shift: Hold/Store piece")
         print("  P: Pause")
         print("  R: Restart")
     

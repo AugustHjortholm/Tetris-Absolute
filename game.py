@@ -33,6 +33,9 @@ class Game:
         self.current_x = 0
         self.current_y = 0
         
+        self.held_piece: Optional[IPiece] = None
+        self.can_hold = True  # Can only hold once per piece placement
+        
         self.last_drop_time = 0.0
         self.drop_interval = 1.0
         
@@ -43,6 +46,8 @@ class Game:
         self.game_state.reset()
         self.board.clear()
         self.piece_generator.reset()
+        self.held_piece = None
+        self.can_hold = True
         self._spawn_piece()
         self.last_drop_time = time.time()
         self._update_drop_interval()
@@ -106,6 +111,10 @@ class Game:
         if self.input_handler.should_hard_drop():
             self._hard_drop()
         
+        # Handle hold/store piece
+        if hasattr(self.input_handler, 'should_hold') and self.input_handler.should_hold():
+            self._hold_piece()
+        
         return True
     
     def render(self) -> None:
@@ -124,6 +133,10 @@ class Game:
         # Render next piece
         next_piece = self.piece_generator.peek()
         self.renderer.render_next_piece(next_piece)
+        
+        # Render held piece
+        if hasattr(self.renderer, 'render_held_piece'):
+            self.renderer.render_held_piece(self.held_piece)
         
         # Render game state
         self.renderer.render_game_state(self.game_state)
@@ -160,6 +173,9 @@ class Game:
             return
         
         self.board.place_piece(self.current_piece, self.current_x, self.current_y)
+        
+        # Re-enable hold after locking a piece
+        self.can_hold = True
         
         # Check for line clears
         full_rows = self.board.get_full_rows()
@@ -269,4 +285,34 @@ class Game:
             ghost_y += 1
         
         return ghost_y
+    
+    def _hold_piece(self) -> None:
+        """Hold/store the current piece"""
+        if not self.current_piece or not self.can_hold:
+            return
+        
+        # Get the piece type to recreate it in default rotation
+        from implementations.standard_piece import PieceFactory
+        current_type = self.current_piece.type
+        
+        if self.held_piece is None:
+            # First time holding - store current piece type and get next from queue
+            self.held_piece = PieceFactory.create(current_type)
+            self._spawn_piece()
+        else:
+            # Swap: get held piece type and recreate both in default rotation
+            held_type = self.held_piece.type
+            self.held_piece = PieceFactory.create(current_type)
+            self.current_piece = PieceFactory.create(held_type)
+            
+            # Reset position for swapped piece
+            self.current_x = self.board.width // 2 - self.current_piece.width // 2
+            self.current_y = 0
+            
+            # Check if swapped piece can be placed (game over if not)
+            if not self.board.can_place_piece(self.current_piece, self.current_x, self.current_y):
+                self.game_state.set_game_over(True)
+        
+        # Can only hold once until piece is locked
+        self.can_hold = False
 

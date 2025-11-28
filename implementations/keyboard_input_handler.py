@@ -18,6 +18,7 @@ class KeyboardInputHandler(IInputHandler):
         self._rotate_right = False
         self._pause = False
         self._restart = False
+        self._hold = False
         
         # Continuous actions (trigger while held)
         self._soft_drop_held = False
@@ -32,6 +33,7 @@ class KeyboardInputHandler(IInputHandler):
         self._rotate_right = False
         self._pause = False
         self._restart = False
+        self._hold = False
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -67,6 +69,10 @@ class KeyboardInputHandler(IInputHandler):
                 # Restart
                 elif event.key == pygame.K_r:
                     self._restart = True
+                
+                # Hold/Store piece
+                elif event.key in (pygame.K_c, pygame.K_LSHIFT, pygame.K_RSHIFT):
+                    self._hold = True
             
             elif event.type == pygame.KEYUP:
                 # Stop soft drop when key released
@@ -106,4 +112,8 @@ class KeyboardInputHandler(IInputHandler):
     def should_restart(self) -> bool:
         """Check if should restart"""
         return self._restart
+    
+    def should_hold(self) -> bool:
+        """Check if should hold/store piece"""
+        return self._hold
 
