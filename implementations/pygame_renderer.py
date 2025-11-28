@@ -10,9 +10,10 @@ from core.interfaces import IRenderer, IBoard, IPiece, IGameState
 class PygameRenderer(IRenderer):
     """Pygame implementation of the renderer"""
     
-    def __init__(self, screen: pygame.Surface, cell_size: int = 30):
+    def __init__(self, screen: pygame.Surface, cell_size: int = 30, use_controller: bool = False):
         self.screen = screen
         self.cell_size = cell_size
+        self.use_controller = use_controller
         
         # Calculate layout
         self.board_x = 20
@@ -215,15 +216,25 @@ class PygameRenderer(IRenderer):
         title = self.font_small.render("CONTROLS", True, (255, 215, 0))
         self.screen.blit(title, (self.panel_x + 10, controls_y + 10))
         
-        # Controls list
-        controls = [
-            "← → : Move",
-            "A D : Rotate L/R",
-            "↑ : Soft Drop",
-            "↓ : Hard Drop",
-            "P : Pause",
-            "R : Restart"
-        ]
+        # Controls list based on input method
+        if self.use_controller:
+            controls = [
+                "D-Pad ←→ : Move",
+                "Square : Rotate CW",
+                "Cross : Rotate CCW",
+                "D-Pad ↑ : Hard",
+                "D-Pad ↓ : Soft",
+                "Options : Pause"
+            ]
+        else:
+            controls = [
+                "← → : Move",
+                "A D : Rotate L/R",
+                "↑ : Soft Drop",
+                "↓ : Hard Drop",
+                "P : Pause",
+                "R : Restart"
+            ]
         
         y = controls_y + 40
         for control in controls:

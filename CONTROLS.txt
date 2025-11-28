@@ -1,0 +1,70 @@
+================================================================================
+                        TETRIS ROGUELIKE - CONTROL SCHEME
+================================================================================
+
+CONTROLLER CONTROLS (PlayStation 5 DualSense)
+===============================================
+
+PRIMARY CONTROLS:
+-----------------
+Move Left           = D-Pad Left
+Move Right          = D-Pad Right
+Rotate Clockwise    = Square (□)
+Rotate CCW          = Cross (✕)
+Soft Drop (hold)    = D-Pad Down
+Hard Drop (instant) = D-Pad Up
+Pause               = Options
+Restart             = Share
+
+ALTERNATIVE CONTROLS:
+---------------------
+Move Left/Right     = Left Stick (Horizontal)
+Soft Drop           = Left Stick Down (hold)
+Rotate CCW          = L1
+Rotate Clockwise    = R1
+Pause               = Triangle (△)
+
+
+CONTROLLER CONTROLS (Xbox - Untested)
+===============================================
+Move Left           = D-Pad Left
+Move Right          = D-Pad Right
+Rotate Clockwise    = X
+Rotate CCW          = A
+Soft Drop (hold)    = D-Pad Down
+Hard Drop (instant) = D-Pad Up
+Pause               = Start
+Restart             = Back
+
+ALTERNATIVE CONTROLS:
+---------------------
+Move Left/Right     = Left Stick (Horizontal)
+Soft Drop           = Left Stick Down (hold)
+Rotate CCW          = LB
+Rotate Clockwise    = RB
+Pause               = Y
+
+
+KEYBOARD CONTROLS
+===============================================
+Move Left           = Left Arrow
+Move Right          = Right Arrow
+Rotate CCW          = A or Z
+Rotate Clockwise    = D
+Soft Drop (hold)    = Up Arrow
+Hard Drop (instant) = Down Arrow
+Pause               = P or Escape
+Restart             = R
+
+
+NOTES:
+======
+- Soft drop: Hold the button to make pieces fall faster continuously
+- Hard drop: Instantly drops the piece to the bottom
+- One press of Left/Right = One space of movement (no auto-repeat)
+- Rotation uses the Super Rotation System (SRS) with wall kicks
+- Controller is auto-detected on startup
+- If no controller is detected, keyboard controls are used
+
+================================================================================
+

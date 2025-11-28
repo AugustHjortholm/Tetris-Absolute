@@ -77,13 +77,37 @@ python main.py
 
 ## Controls
 
+### Keyboard
+
 - **← →** - Move piece left/right (one press = one move)
 - **A / Z** - Rotate counter-clockwise
 - **D** - Rotate clockwise
-- **↑** - Soft drop (faster fall)
+- **↑** - Soft drop (hold for continuous drop)
 - **↓** - Hard drop (instant drop)
 - **P** or **Escape** - Pause
 - **R** - Restart game
+
+### Controller (Auto-detected)
+
+**Tested:** PlayStation 5 DualSense  
+**Should work:** Xbox controllers (untested)
+
+**Primary Controls:**
+- **D-Pad Left** - Move piece left
+- **D-Pad Right** - Move piece right
+- **Square / X (Xbox)** - Rotate clockwise
+- **Cross (X) / A (Xbox)** - Rotate counter-clockwise
+- **D-Pad Down** - Soft drop (hold for continuous drop)
+- **D-Pad Up** - Hard drop (instant drop)
+- **Options / Start / Triangle / Y** - Pause
+- **Share / Back** - Restart
+
+**Alternative Controls:**
+- **Left Stick** - Can be used for movement and soft drop
+- **L1 / LB** - Rotate counter-clockwise
+- **R1 / RB** - Rotate clockwise
+
+The game will automatically detect and use your controller if connected. Otherwise, it falls back to keyboard controls.
 
 ## Creating an Executable
 

@@ -10,6 +10,7 @@ from implementations.seven_bag_generator import SevenBagGenerator
 from implementations.standard_game_state import StandardGameState
 from implementations.pygame_renderer import PygameRenderer
 from implementations.keyboard_input_handler import KeyboardInputHandler
+from implementations.controller_input_handler import ControllerInputHandler
 from implementations.standard_scoring_system import StandardScoringSystem
 
 
@@ -32,8 +33,18 @@ def main():
     board = StandardBoard(width=10, height=20)
     piece_generator = SevenBagGenerator()
     game_state = StandardGameState()
-    renderer = PygameRenderer(screen, cell_size=30)
-    input_handler = KeyboardInputHandler()
+    
+    # Auto-detect controller or use keyboard
+    use_controller = ControllerInputHandler.is_controller_connected()
+    
+    if use_controller:
+        print("\n=== Controller Mode ===")
+        input_handler = ControllerInputHandler()
+    else:
+        print("\n=== Keyboard Mode ===")
+        input_handler = KeyboardInputHandler()
+    
+    renderer = PygameRenderer(screen, cell_size=30, use_controller=use_controller)
     scoring_system = StandardScoringSystem()
     
     # Create the game
@@ -49,14 +60,29 @@ def main():
     # Start the game
     game.start()
     
-    print("Game started!")
-    print("Controls:")
-    print("  Left/Right Arrows: Move piece")
-    print("  A/D: Rotate left/right")
-    print("  Up Arrow: Soft drop (faster fall)")
-    print("  Down Arrow: Hard drop (instant)")
-    print("  P: Pause")
-    print("  R: Restart")
+    print("\nGame started!")
+    print("\n=== Controls ===")
+    
+    if isinstance(input_handler, ControllerInputHandler):
+        print("Controller Controls:")
+        print("  D-Pad Left: Move left")
+        print("  D-Pad Right: Move right")
+        print("  Square: Rotate clockwise")
+        print("  Cross (X): Rotate counter-clockwise")
+        print("  D-Pad Down: Soft drop (hold)")
+        print("  D-Pad Up: Hard drop (instant)")
+        print("  Options / Triangle: Pause")
+        print("  Share: Restart")
+        print("\nAlternatives: Left Stick for movement, L1/R1 for rotation")
+    else:
+        print("Keyboard Controls:")
+        print("  Left/Right Arrows: Move piece")
+        print("  A/Z: Rotate left")
+        print("  D: Rotate right")
+        print("  Up Arrow: Soft drop (hold to continuously drop)")
+        print("  Down Arrow: Hard drop (instant)")
+        print("  P: Pause")
+        print("  R: Restart")
     
     # Main game loop
     running = True
