@@ -74,10 +74,16 @@ class Game:
         self.last_drop_time = time.time()
         self._update_drop_interval()
         self.running = True
+        self.return_to_menu = False
     
     def restart(self) -> None:
         """Restart the game"""
         self.start()
+    
+    def request_menu(self) -> None:
+        """Request to return to the main menu"""
+        self.return_to_menu = True
+        self.running = False
     
     def update(self) -> None:
         """Update game state"""
@@ -149,10 +155,10 @@ class Game:
         if not self.input_handler.poll_events():
             return False
         
-        # Handle restart
+        # Handle return to menu (was restart)
         if self.input_handler.should_restart():
-            self.restart()
-            return True
+            self.request_menu()
+            return False  # Stop the game loop
         
         # Handle pause
         if self.input_handler.should_pause():

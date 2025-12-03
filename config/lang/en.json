@@ -1,6 +1,17 @@
 {
   "game": {
-    "title": "Tetris Roguelike"
+    "title": "TETRIS",
+    "subtitle": "ROGUELIKE"
+  },
+  "menu": {
+    "new_game": "NEW GAME",
+    "custom_game": "CUSTOM GAME",
+    "challenges": "CHALLENGES",
+    "options": "OPTIONS",
+    "exit": "EXIT",
+    "coming_soon": "Coming Soon",
+    "controls_keyboard": "Arrow Keys: Navigate  |  Enter: Select  |  Esc: Exit",
+    "controls_controller": "D-Pad: Navigate  |  X: Select  |  Circle: Back"
   },
   "ui": {
     "score": "SCORE",
@@ -18,7 +29,7 @@
     "hard_drop": "↓ : Hard Drop",
     "hold": "C : Hold",
     "pause": "P : Pause",
-    "restart": "R : Restart"
+    "menu": "R : Menu"
   },
   "controls_controller": {
     "move": "D-Pad ←→ : Move",
@@ -28,7 +39,7 @@
     "hard_drop": "D-Pad ↑ : Hard",
     "hold": "L1/R1 : Hold",
     "pause": "Options : Pause",
-    "restart": "Share : Restart"
+    "menu": "Share : Menu"
   },
   "notifications": {
     "tetris": "TETRIS!",
@@ -39,7 +50,7 @@
   "game_states": {
     "paused": "PAUSED",
     "game_over": "GAME OVER",
-    "press_restart": "Press R to restart",
+    "press_menu": "Press R for Menu",
     "press_resume": "Press P to resume"
   },
   "console": {

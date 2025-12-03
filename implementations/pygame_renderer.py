@@ -193,15 +193,15 @@ class PygameRenderer(IRenderer):
                                                      self.screen.get_height() // 2 - 30))
         self.screen.blit(game_over_text, text_rect)
         
-        # "Press R to restart" text from localization
-        restart_text = self.font_small.render(
-            localization.get("game_states", "press_restart"), 
+        # "Press R for Menu" text from localization
+        menu_text = self.font_small.render(
+            localization.get("game_states", "press_menu"), 
             True, 
             self.text_color
         )
-        restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, 
-                                                     self.screen.get_height() // 2 + 30))
-        self.screen.blit(restart_text, restart_rect)
+        menu_rect = menu_text.get_rect(center=(self.screen.get_width() // 2, 
+                                                self.screen.get_height() // 2 + 30))
+        self.screen.blit(menu_text, menu_rect)
     
     def show_points_notification(self, points: int, special_type: str = None) -> None:
         """Show a points notification for line clears"""

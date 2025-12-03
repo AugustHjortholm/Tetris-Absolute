@@ -71,14 +71,35 @@
   "notifications": {
     "duration": 1.5
   },
+  "menu": {
+    "colors": {
+      "background": "#0F0A23",
+      "title": "#00FFFF",
+      "text": "#FFFFFF",
+      "selected": "#FFD700",
+      "disabled": "#646464",
+      "button_background": "#1E143C",
+      "button_hover": "#32235A",
+      "button_border": "#6450A0",
+      "grid_line": "#191232",
+      "grid_highlight": "#231941"
+    },
+    "grid": {
+      "cell_size": 60
+    },
+    "input": {
+      "cooldown_ms": 200
+    },
+    "version": "v0.1.0 - Dev Build"
+  },
   "pieces": {
     "I": {
       "shape": [
-        [0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0 ],
-        [0, 0, 0, 0, 0]
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
       ]
     },
     "J": {

@@ -107,6 +107,32 @@ class GameConfig:
     def get_all_piece_types(self) -> list:
         """Get list of all piece types."""
         return list(self._config["pieces"].keys())
+    
+    # Menu
+    @property
+    def menu(self) -> Dict[str, Any]:
+        """Get menu configuration."""
+        return self._config.get("menu", {})
+    
+    def get_menu_color(self, color_name: str) -> Tuple[int, int, int]:
+        """Get RGB color for a menu element."""
+        hex_color = self._config["menu"]["colors"].get(color_name, "#FFFFFF")
+        return hex_to_rgb(hex_color)
+    
+    @property
+    def menu_grid_cell_size(self) -> int:
+        """Get menu grid cell size."""
+        return self._config["menu"]["grid"]["cell_size"]
+    
+    @property
+    def menu_input_cooldown(self) -> float:
+        """Get menu input cooldown in seconds."""
+        return self._config["menu"]["input"]["cooldown_ms"] / 1000
+    
+    @property
+    def menu_version(self) -> str:
+        """Get version string for menu."""
+        return self._config["menu"]["version"]
 
 
 class Localization:
