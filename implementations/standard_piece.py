@@ -1,10 +1,12 @@
 """
 Standard Tetris piece implementations.
 Includes the 7 standard tetrominoes.
+Piece definitions loaded from config/game_config.json
 """
 
 from typing import List, Tuple
 from core.interfaces import IPiece
+from config import game_config
 
 
 class StandardPiece(IPiece):
@@ -63,79 +65,21 @@ class StandardPiece(IPiece):
 
 
 class PieceFactory:
-    """Factory for creating standard Tetris pieces"""
-    
-    # Standard Tetris pieces with their shapes and colors
-    PIECES = {
-        'I': {
-            'color': (0, 255, 255),  # Cyan
-            'shape': [
-                [0, 0, 0, 0],
-                [1, 1, 1, 1],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ]
-        },
-        'J': {
-            'color': (0, 0, 255),  # Blue
-            'shape': [
-                [1, 0, 0],
-                [1, 1, 1],
-                [0, 0, 0],
-            ]
-        },
-        'L': {
-            'color': (255, 165, 0),  # Orange
-            'shape': [
-                [0, 0, 1],
-                [1, 1, 1],
-                [0, 0, 0],
-            ]
-        },
-        'O': {
-            'color': (255, 255, 0),  # Yellow
-            'shape': [
-                [1, 1],
-                [1, 1],
-            ]
-        },
-        'S': {
-            'color': (0, 255, 0),  # Green
-            'shape': [
-                [0, 1, 1],
-                [1, 1, 0],
-                [0, 0, 0],
-            ]
-        },
-        'T': {
-            'color': (128, 0, 128),  # Purple
-            'shape': [
-                [0, 1, 0],
-                [1, 1, 1],
-                [0, 0, 0],
-            ]
-        },
-        'Z': {
-            'color': (255, 0, 0),  # Red
-            'shape': [
-                [1, 1, 0],
-                [0, 1, 1],
-                [0, 0, 0],
-            ]
-        },
-    }
+    """Factory for creating Tetris pieces from config"""
     
     @staticmethod
     def create(piece_type: str) -> StandardPiece:
-        """Create a piece by type"""
-        if piece_type not in PieceFactory.PIECES:
+        """Create a piece by type from config"""
+        all_types = game_config.get_all_piece_types()
+        if piece_type not in all_types:
             raise ValueError(f"Unknown piece type: {piece_type}")
         
-        piece_data = PieceFactory.PIECES[piece_type]
-        return StandardPiece(piece_type, piece_data['color'], piece_data['shape'])
+        color = game_config.get_piece_color(piece_type)
+        shape = game_config.get_piece_shape(piece_type)
+        return StandardPiece(piece_type, color, shape)
     
     @staticmethod
     def get_all_types() -> List[str]:
-        """Get all available piece types"""
-        return list(PieceFactory.PIECES.keys())
+        """Get all available piece types from config"""
+        return game_config.get_all_piece_types()
 

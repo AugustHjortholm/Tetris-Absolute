@@ -1,12 +1,14 @@
 """
 7-bag random piece generator.
 This is the standard modern Tetris randomization algorithm.
+Piece types loaded from config/game_config.json
 """
 
 import random
 from typing import List
 from core.interfaces import IPieceGenerator, IPiece
 from implementations.standard_piece import PieceFactory
+from config import game_config
 
 
 class SevenBagGenerator(IPieceGenerator):
@@ -23,8 +25,8 @@ class SevenBagGenerator(IPieceGenerator):
         self._next_piece = self._generate_piece()
     
     def _fill_bag(self) -> None:
-        """Fill the bag with a shuffled set of all piece types"""
-        self._bag = PieceFactory.get_all_types()[:]
+        """Fill the bag with all piece types from config"""
+        self._bag = game_config.get_all_piece_types()[:]
         random.shuffle(self._bag)
     
     def _generate_piece(self) -> IPiece:

@@ -1,6 +1,7 @@
 """
 Main game controller.
 Orchestrates all game components with loose coupling.
+Settings loaded from config/game_config.json
 """
 
 import time
@@ -9,6 +10,7 @@ from core.interfaces import (
     IBoard, IPiece, IPieceGenerator, IGameState,
     IRenderer, IInputHandler, IScoringSystem
 )
+from config import game_config
 
 
 class Game:
@@ -37,23 +39,27 @@ class Game:
         self.can_hold = True  # Can only hold once per piece placement
         
         self.last_drop_time = 0.0
-        self.drop_interval = 1.0
-        self.soft_drop_multiplier = 10.0  # Soft drop is 10x faster
+        self.drop_interval = game_config.speed["base_drop_interval"]
+        self.soft_drop_multiplier = game_config.speed["soft_drop_multiplier"]
         self.is_soft_dropping = False
         
-        # Lock delay system
-        self.lock_delay = 1.0  # 1 second before piece locks when grounded
-        self.max_lock_delay = 3.0  # Maximum total lock delay time
-        self.lock_delay_timer = 0.0  # Current lock delay timer
-        self.total_lock_delay_timer = 0.0  # Total time spent in lock delay
-        self.is_grounded = False  # Is piece touching ground
-        self.lock_delay_start_time = 0.0  # When lock delay started
-        self.total_lock_delay_start_time = 0.0  # When piece first touched ground
-        self.soft_drop_lock_multiplier = 10.0  # Lock delay is 10x faster when soft dropping
+        # Lock delay system from config
+        lock_delay_config = game_config.lock_delay
+        self.lock_delay = lock_delay_config["base_delay"]
+        self.max_lock_delay = lock_delay_config["max_delay"]
+        self.lock_delay_timer = 0.0
+        self.total_lock_delay_timer = 0.0
+        self.is_grounded = False
+        self.lock_delay_start_time = 0.0
+        self.total_lock_delay_start_time = 0.0
+        self.soft_drop_lock_multiplier = lock_delay_config["soft_drop_multiplier"]
         
-        # Scoring multipliers
-        self.last_clear_was_tetris = False  # Track if last clear was a Tetris (4 lines)
-        self.combo_count = 0  # Track consecutive line clears
+        # Scoring multipliers from config
+        self.tetris_multiplier = game_config.multipliers["tetris"]
+        self.back_to_back_multiplier = game_config.multipliers["back_to_back"]
+        self.combo_multiplier_per_level = game_config.multipliers["combo_per_level"]
+        self.last_clear_was_tetris = False
+        self.combo_count = 0
         
         self.running = False
     
@@ -280,23 +286,23 @@ class Game:
             # Update combo first (so we can apply multiplier)
             self.combo_count += 1
             
-            # Calculate combo multiplier: 1.1x per combo (starting at combo 2)
-            # combo 1 = 1.0x, combo 2 = 1.1x, combo 3 = 1.2x, etc.
+            # Calculate combo multiplier from config
+            # combo 1 = 1.0x, combo 2 = 1.0 + 0.1, combo 3 = 1.0 + 0.2, etc.
             combo_multiplier = 1.0
             if self.combo_count >= 2:
-                combo_multiplier = 1.0 + (self.combo_count - 1) * 0.1
+                combo_multiplier = 1.0 + (self.combo_count - 1) * self.combo_multiplier_per_level
             
-            # Apply multipliers
+            # Apply multipliers from config
             final_score = base_score
             special_type = None
             
             if is_back_to_back:
-                # Back-to-back Tetris: 1.2x * 1.5x = 1.8x multiplier
-                final_score = int(base_score * 1.2 * 1.5 * combo_multiplier)
+                # Back-to-back Tetris: tetris_mult * b2b_mult * combo_mult
+                final_score = int(base_score * self.tetris_multiplier * self.back_to_back_multiplier * combo_multiplier)
                 special_type = "back_to_back"
             elif is_tetris:
-                # Tetris: 1.2x multiplier
-                final_score = int(base_score * 1.2 * combo_multiplier)
+                # Tetris: tetris_mult * combo_mult
+                final_score = int(base_score * self.tetris_multiplier * combo_multiplier)
                 special_type = "tetris"
             else:
                 # Normal clear with combo multiplier

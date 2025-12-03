@@ -1,0 +1,57 @@
+{
+  "game": {
+    "title": "Tetris Roguelike"
+  },
+  "ui": {
+    "score": "SCORE",
+    "level": "LEVEL",
+    "lines": "LINES",
+    "next": "NEXT",
+    "hold": "HOLD",
+    "controls": "CONTROLS"
+  },
+  "controls_keyboard": {
+    "move": "← → : Move",
+    "rotate_cw": "D : Rotate CW",
+    "rotate_ccw": "A : Rotate CCW",
+    "soft_drop": "↑ : Soft Drop",
+    "hard_drop": "↓ : Hard Drop",
+    "hold": "C : Hold",
+    "pause": "P : Pause",
+    "restart": "R : Restart"
+  },
+  "controls_controller": {
+    "move": "D-Pad ←→ : Move",
+    "rotate_cw": "Square : Rotate CW",
+    "rotate_ccw": "Cross : Rotate CCW",
+    "soft_drop": "D-Pad ↓ : Soft",
+    "hard_drop": "D-Pad ↑ : Hard",
+    "hold": "L1/R1 : Hold",
+    "pause": "Options : Pause",
+    "restart": "Share : Restart"
+  },
+  "notifications": {
+    "tetris": "TETRIS!",
+    "back_to_back": "BACK-TO-BACK!",
+    "combo": "x{count} COMBO!",
+    "multiplier": "{value}x"
+  },
+  "game_states": {
+    "paused": "PAUSED",
+    "game_over": "GAME OVER",
+    "press_restart": "Press R to restart",
+    "press_resume": "Press P to resume"
+  },
+  "console": {
+    "game_started": "Game started!",
+    "controls_header": "=== Controls ===",
+    "controller_mode": "=== Controller Mode ===",
+    "keyboard_mode": "=== Keyboard Mode ===",
+    "controller_detected": "Controller detected: {name}",
+    "playstation_mapping": "  > PlayStation controller mapping activated",
+    "xbox_mapping": "  > Xbox controller mapping activated (untested)",
+    "unknown_mapping": "  > Unknown controller, using PlayStation mapping as default",
+    "no_controller": "Warning: No controller detected. Please connect a controller."
+  }
+}
+
