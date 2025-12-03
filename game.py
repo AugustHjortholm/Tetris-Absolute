@@ -38,6 +38,22 @@ class Game:
         
         self.last_drop_time = 0.0
         self.drop_interval = 1.0
+        self.soft_drop_multiplier = 10.0  # Soft drop is 10x faster
+        self.is_soft_dropping = False
+        
+        # Lock delay system
+        self.lock_delay = 1.0  # 1 second before piece locks when grounded
+        self.max_lock_delay = 3.0  # Maximum total lock delay time
+        self.lock_delay_timer = 0.0  # Current lock delay timer
+        self.total_lock_delay_timer = 0.0  # Total time spent in lock delay
+        self.is_grounded = False  # Is piece touching ground
+        self.lock_delay_start_time = 0.0  # When lock delay started
+        self.total_lock_delay_start_time = 0.0  # When piece first touched ground
+        self.soft_drop_lock_multiplier = 10.0  # Lock delay is 10x faster when soft dropping
+        
+        # Scoring multipliers
+        self.last_clear_was_tetris = False  # Track if last clear was a Tetris (4 lines)
+        self.combo_count = 0  # Track consecutive line clears
         
         self.running = False
     
@@ -67,11 +83,60 @@ class Game:
         if self.game_state.is_paused:
             return
         
-        # Auto drop based on time
         current_time = time.time()
-        if current_time - self.last_drop_time >= self.drop_interval:
+        
+        # Check if piece is grounded (touching bottom or another piece)
+        if self.current_piece:
+            grounded = not self.board.can_place_piece(
+                self.current_piece, 
+                self.current_x, 
+                self.current_y + 1
+            )
+            
+            if grounded and not self.is_grounded:
+                # Just became grounded - start lock delay
+                self.is_grounded = True
+                self.lock_delay_start_time = current_time
+                if self.total_lock_delay_start_time == 0.0:
+                    self.total_lock_delay_start_time = current_time
+            elif not grounded:
+                # Piece is no longer grounded
+                self.is_grounded = False
+                self.lock_delay_start_time = 0.0
+            
+            # Handle lock delay
+            if self.is_grounded:
+                time_since_grounded = current_time - self.lock_delay_start_time
+                total_time_grounded = current_time - self.total_lock_delay_start_time
+                
+                # Reduce lock delay when soft dropping
+                current_lock_delay = self.lock_delay
+                current_max_lock_delay = self.max_lock_delay
+                if self.is_soft_dropping:
+                    current_lock_delay = self.lock_delay / self.soft_drop_lock_multiplier
+                    current_max_lock_delay = self.max_lock_delay / self.soft_drop_lock_multiplier
+                
+                # Lock if either timer expires
+                if time_since_grounded >= current_lock_delay or total_time_grounded >= current_max_lock_delay:
+                    self._lock_piece()
+                    return
+        
+        # Update soft drop state from input handler
+        if self.current_piece:
+            self.is_soft_dropping = self.input_handler.should_move_down()
+        
+        # Auto drop based on time (with soft drop speed multiplier)
+        current_drop_interval = self.drop_interval
+        if self.is_soft_dropping:
+            current_drop_interval = self.drop_interval / self.soft_drop_multiplier
+        
+        if current_time - self.last_drop_time >= current_drop_interval:
             self._drop_piece()
             self.last_drop_time = current_time
+            
+            # Add soft drop points only when actually dropping
+            if self.is_soft_dropping and self.current_piece:
+                self.game_state.add_score(1)
     
     def handle_input(self) -> bool:
         """Handle input. Returns False if should quit."""
@@ -99,8 +164,8 @@ class Game:
         if self.input_handler.should_move_right():
             self._move_right()
         
-        if self.input_handler.should_move_down():
-            self._move_down()
+        # Soft drop is now handled in update() with speed multiplier
+        # No need to call _move_down() here anymore
         
         if self.input_handler.should_rotate():
             self._rotate(clockwise=True)
@@ -141,6 +206,19 @@ class Game:
         # Render game state
         self.renderer.render_game_state(self.game_state)
         
+        # Render points notification if active
+        if hasattr(self.renderer, 'render_points_notification'):
+            self.renderer.render_points_notification()
+        
+        # Render combo notification if active
+        if hasattr(self.renderer, 'render_combo_notification'):
+            self.renderer.render_combo_notification()
+        
+        # Render pause overlay if paused
+        if self.game_state.is_paused:
+            if hasattr(self.renderer, 'render_paused'):
+                self.renderer.render_paused()
+        
         # Render game over if needed
         if self.game_state.is_game_over:
             self.renderer.render_game_over()
@@ -153,6 +231,14 @@ class Game:
         self.current_x = self.board.width // 2 - self.current_piece.width // 2
         self.current_y = 0
         
+        # Reset lock delay timers
+        self.is_grounded = False
+        self.lock_delay_start_time = 0.0
+        self.total_lock_delay_start_time = 0.0
+        
+        # Reset soft drop state for new piece
+        self.is_soft_dropping = False
+
         # Check if piece can be placed (game over if not)
         if not self.board.can_place_piece(self.current_piece, self.current_x, self.current_y):
             self.game_state.set_game_over(True)
@@ -164,8 +250,9 @@ class Game:
         
         if self.board.can_place_piece(self.current_piece, self.current_x, self.current_y + 1):
             self.current_y += 1
-        else:
-            self._lock_piece()
+            # Reset lock delay if piece moves down
+            if self.is_grounded:
+                self.lock_delay_start_time = time.time()
     
     def _lock_piece(self) -> None:
         """Lock the current piece to the board"""
@@ -181,9 +268,57 @@ class Game:
         full_rows = self.board.get_full_rows()
         if full_rows:
             self.board.clear_rows(full_rows)
-            score = self.scoring_system.calculate_score(len(full_rows), self.game_state.level)
-            self.game_state.add_score(score)
-            self.game_state.add_lines(len(full_rows))
+            lines_cleared = len(full_rows)
+            
+            # Calculate base score
+            base_score = self.scoring_system.calculate_score(lines_cleared, self.game_state.level)
+            
+            # Check for special clears
+            is_tetris = lines_cleared == 4
+            is_back_to_back = is_tetris and self.last_clear_was_tetris
+            
+            # Update combo first (so we can apply multiplier)
+            self.combo_count += 1
+            
+            # Calculate combo multiplier: 1.1x per combo (starting at combo 2)
+            # combo 1 = 1.0x, combo 2 = 1.1x, combo 3 = 1.2x, etc.
+            combo_multiplier = 1.0
+            if self.combo_count >= 2:
+                combo_multiplier = 1.0 + (self.combo_count - 1) * 0.1
+            
+            # Apply multipliers
+            final_score = base_score
+            special_type = None
+            
+            if is_back_to_back:
+                # Back-to-back Tetris: 1.2x * 1.5x = 1.8x multiplier
+                final_score = int(base_score * 1.2 * 1.5 * combo_multiplier)
+                special_type = "back_to_back"
+            elif is_tetris:
+                # Tetris: 1.2x multiplier
+                final_score = int(base_score * 1.2 * combo_multiplier)
+                special_type = "tetris"
+            else:
+                # Normal clear with combo multiplier
+                final_score = int(base_score * combo_multiplier)
+            
+            # Add score
+            self.game_state.add_score(final_score)
+            self.game_state.add_lines(lines_cleared)
+            
+            # Track Tetris for back-to-back detection
+            self.last_clear_was_tetris = is_tetris
+            
+            # Show points notification with special type
+            if hasattr(self.renderer, 'show_points_notification'):
+                self.renderer.show_points_notification(final_score, special_type)
+            
+            # Show combo notification if combo >= 2
+            if self.combo_count >= 2 and hasattr(self.renderer, 'show_combo_notification'):
+                self.renderer.show_combo_notification(self.combo_count, combo_multiplier)
+        else:
+            # No lines cleared - reset combo
+            self.combo_count = 0
             
             # Check for level up
             level_up_threshold = self.scoring_system.get_level_up_threshold(self.game_state.level)
@@ -201,6 +336,9 @@ class Game:
         
         if self.board.can_place_piece(self.current_piece, self.current_x - 1, self.current_y):
             self.current_x -= 1
+            # Reset lock delay timer on movement
+            if self.is_grounded:
+                self.lock_delay_start_time = time.time()
     
     def _move_right(self) -> None:
         """Move piece right"""
@@ -209,15 +347,14 @@ class Game:
         
         if self.board.can_place_piece(self.current_piece, self.current_x + 1, self.current_y):
             self.current_x += 1
+            # Reset lock delay timer on movement
+            if self.is_grounded:
+                self.lock_delay_start_time = time.time()
     
     def _move_down(self) -> None:
-        """Move piece down (soft drop)"""
-        if not self.current_piece:
-            return
-        
-        if self.board.can_place_piece(self.current_piece, self.current_x, self.current_y + 1):
-            self.current_y += 1
-            self.game_state.add_score(1)  # Soft drop points
+        """Move piece down (no longer used for soft drop, kept for compatibility)"""
+        # Soft drop is now handled by the drop speed multiplier in update()
+        pass
     
     def _rotate(self, clockwise: bool = True) -> None:
         """Rotate the piece"""
@@ -229,6 +366,9 @@ class Game:
         # Try basic rotation
         if self.board.can_place_piece(rotated, self.current_x, self.current_y):
             self.current_piece = rotated
+            # Reset lock delay timer on rotation
+            if self.is_grounded:
+                self.lock_delay_start_time = time.time()
             return
         
         # Try wall kicks (simple version)
@@ -245,6 +385,9 @@ class Game:
                 self.current_piece = rotated
                 self.current_x += kick_x
                 self.current_y += kick_y
+                # Reset lock delay timer on rotation
+                if self.is_grounded:
+                    self.lock_delay_start_time = time.time()
                 return
     
     def _hard_drop(self) -> None:

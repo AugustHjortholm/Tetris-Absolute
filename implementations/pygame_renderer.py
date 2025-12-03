@@ -38,6 +38,14 @@ class PygameRenderer(IRenderer):
         self.grid_color = (40, 40, 60)
         self.text_color = (255, 255, 255)
         self.panel_bg = (30, 30, 50)
+        
+        # Points notification
+        self.points_notification = None  # (points, start_time, special_type)
+        self.points_notification_duration = 1.5  # seconds to show notification
+        
+        # Combo notification
+        self.combo_notification = None  # (combo_count, start_time, multiplier)
+        self.combo_notification_duration = 1.5  # seconds to show combo
     
     def clear(self) -> None:
         """Clear the screen"""
@@ -169,6 +177,120 @@ class PygameRenderer(IRenderer):
         restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, 
                                                      self.screen.get_height() // 2 + 30))
         self.screen.blit(restart_text, restart_rect)
+    
+    def show_points_notification(self, points: int, special_type: str = None) -> None:
+        """Show a points notification for line clears"""
+        import time
+        self.points_notification = (points, time.time(), special_type)
+    
+    def show_combo_notification(self, combo_count: int, multiplier: float = 1.0) -> None:
+        """Show a combo notification"""
+        import time
+        self.combo_notification = (combo_count, time.time(), multiplier)
+    
+    def render_points_notification(self) -> None:
+        """Render the points notification if active"""
+        if self.points_notification is None:
+            return
+        
+        import time
+        points, start_time, special_type = self.points_notification
+        elapsed = time.time() - start_time
+        
+        if elapsed >= self.points_notification_duration:
+            self.points_notification = None
+            return
+        
+        # Calculate fade (starts fully visible, fades out)
+        alpha = int(255 * (1 - elapsed / self.points_notification_duration))
+        
+        # Determine color and text based on special type
+        if special_type == "back_to_back":
+            color = (255, 100, 255)  # Magenta/Pink for back-to-back
+            special_text = "BACK-TO-BACK!"
+        elif special_type == "tetris":
+            color = (0, 255, 255)  # Cyan for Tetris
+            special_text = "TETRIS!"
+        else:
+            color = (255, 215, 0)  # Gold for normal clears
+            special_text = None
+        
+        # Render points text
+        points_text = f"+{points}"
+        text_surface = self.font_medium.render(points_text, True, color)
+        
+        # Create a surface with alpha for fading
+        text_with_alpha = pygame.Surface(text_surface.get_size(), pygame.SRCALPHA)
+        text_with_alpha.blit(text_surface, (0, 0))
+        text_with_alpha.set_alpha(alpha)
+        
+        # Position below the score panel
+        x = self.panel_x + 10
+        y = self.panel_y + 75  # Below the score panel
+        
+        self.screen.blit(text_with_alpha, (x, y))
+        
+        # Render special text if applicable
+        if special_text:
+            special_surface = self.font_small.render(special_text, True, color)
+            special_with_alpha = pygame.Surface(special_surface.get_size(), pygame.SRCALPHA)
+            special_with_alpha.blit(special_surface, (0, 0))
+            special_with_alpha.set_alpha(alpha)
+            self.screen.blit(special_with_alpha, (x, y + 30))
+    
+    def render_combo_notification(self) -> None:
+        """Render the combo notification if active"""
+        if self.combo_notification is None:
+            return
+        
+        import time
+        combo_count, start_time, multiplier = self.combo_notification
+        elapsed = time.time() - start_time
+        
+        if elapsed >= self.combo_notification_duration:
+            self.combo_notification = None
+            return
+        
+        # Calculate fade (starts fully visible, fades out)
+        alpha = int(255 * (1 - elapsed / self.combo_notification_duration))
+        
+        # Render combo text with multiplier
+        combo_text = f"x{combo_count} COMBO!"
+        multiplier_text = f"{multiplier:.1f}x"
+        color = (255, 165, 0)  # Orange for combo
+        
+        # Combo text
+        text_surface = self.font_small.render(combo_text, True, color)
+        text_with_alpha = pygame.Surface(text_surface.get_size(), pygame.SRCALPHA)
+        text_with_alpha.blit(text_surface, (0, 0))
+        text_with_alpha.set_alpha(alpha)
+        
+        # Multiplier text
+        mult_surface = self.font_small.render(multiplier_text, True, (255, 255, 100))  # Yellow
+        mult_with_alpha = pygame.Surface(mult_surface.get_size(), pygame.SRCALPHA)
+        mult_with_alpha.blit(mult_surface, (0, 0))
+        mult_with_alpha.set_alpha(alpha)
+        
+        # Position below the lines panel (different from Tetris/Back-to-back)
+        x = self.panel_x + 10
+        y = self.panel_y + 255  # Below the lines panel
+        
+        self.screen.blit(text_with_alpha, (x, y))
+        self.screen.blit(mult_with_alpha, (x, y + 18))
+    
+    def render_paused(self) -> None:
+        """Render pause overlay with darkened screen"""
+        # Semi-transparent dark overlay (20% brightness reduction = 51 alpha for black overlay)
+        overlay = pygame.Surface(self.screen.get_size())
+        overlay.set_alpha(51)  # 20% of 255 ≈ 51
+        overlay.fill((0, 0, 0))
+        self.screen.blit(overlay, (0, 0))
+        
+        # "PAUSED" text
+        paused_text = self.font_large.render("PAUSED", True, (255, 255, 255))
+        text_rect = paused_text.get_rect(center=(self.screen.get_width() // 2, 
+                                                  self.screen.get_height() // 2))
+        self.screen.blit(paused_text, text_rect)
     
     def flip(self) -> None:
         """Update the display"""
