@@ -13,6 +13,7 @@ from implementations.pygame_renderer import PygameRenderer
 from implementations.keyboard_input_handler import KeyboardInputHandler
 from implementations.controller_input_handler import ControllerInputHandler
 from implementations.standard_scoring_system import StandardScoringSystem
+from implementations.card_renderer import CardRenderer
 
 
 def create_game(screen, use_controller: bool) -> Game:
@@ -29,7 +30,10 @@ def create_game(screen, use_controller: bool) -> Game:
     renderer = PygameRenderer(screen, cell_size=30, use_controller=use_controller)
     scoring_system = StandardScoringSystem()
     
-    return Game(
+    # Create card renderer for roguelike card selection
+    card_renderer = CardRenderer(screen)
+    
+    game = Game(
         board=board,
         piece_generator=piece_generator,
         game_state=game_state,
@@ -37,6 +41,11 @@ def create_game(screen, use_controller: bool) -> Game:
         input_handler=input_handler,
         scoring_system=scoring_system
     )
+    
+    # Attach card renderer to game
+    game.card_renderer = card_renderer
+    
+    return game
 
 
 def run_game(screen, clock, fps: int, use_controller: bool):

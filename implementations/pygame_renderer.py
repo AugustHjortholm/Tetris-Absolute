@@ -107,20 +107,93 @@ class PygameRenderer(IRenderer):
         # Draw the piece centered in the panel
         self._draw_piece_preview(piece, self.panel_x, self.panel_y + 320, 160, 120)
     
-    def render_held_piece(self, piece: Optional[IPiece]) -> None:
+    def render_held_piece(self, piece: Optional[IPiece], disabled: bool = False) -> None:
         """Render the held piece preview"""
         # Draw panel background
         panel_rect = pygame.Rect(self.hold_panel_x, self.hold_panel_y, 160, 160)
         pygame.draw.rect(self.screen, self.panel_bg, panel_rect)
         pygame.draw.rect(self.screen, self.grid_color, panel_rect, 2)
         
-        # Draw "HOLD" label
-        label = self.font_small.render(localization.get("ui", "hold"), True, self.text_gold)
+        # Draw "HOLD" label (red if disabled)
+        label_color = (255, 100, 100) if disabled else self.text_gold
+        label = self.font_small.render(localization.get("ui", "hold"), True, label_color)
         self.screen.blit(label, (self.hold_panel_x + 10, self.hold_panel_y + 10))
         
         # Draw the piece if one is held
-        if piece is not None:
+        if piece is not None and not disabled:
             self._draw_piece_preview(piece, self.hold_panel_x, self.hold_panel_y + 40, 160, 120)
+        elif disabled:
+            # Draw X over the hold panel
+            x1, y1 = self.hold_panel_x + 30, self.hold_panel_y + 50
+            x2, y2 = self.hold_panel_x + 130, self.hold_panel_y + 140
+            pygame.draw.line(self.screen, (255, 100, 100), (x1, y1), (x2, y2), 3)
+            pygame.draw.line(self.screen, (255, 100, 100), (x2, y1), (x1, y2), 3)
+    
+    def render_speed_level(self, speed_level: int) -> None:
+        """Render the current card speed level"""
+        # Position above controls
+        y = self.panel_y + 470
+        
+        # Draw speed level indicator
+        label = self.font_small.render("SPEED", True, self.text_gold)
+        self.screen.blit(label, (self.hold_panel_x + 10, y))
+        
+        # Speed value with color based on level
+        if speed_level <= 3:
+            color = (100, 255, 100)  # Green - easy
+        elif speed_level <= 6:
+            color = (255, 255, 100)  # Yellow - medium
+        elif speed_level <= 9:
+            color = (255, 165, 0)  # Orange - hard
+        else:
+            color = (255, 100, 100)  # Red - very hard
+        
+        value = self.font_medium.render(str(speed_level), True, color)
+        self.screen.blit(value, (self.hold_panel_x + 10, y + 22))
+    
+    def render_collected_cards(self, collected_cards: list) -> None:
+        """Render the list of collected cards as colored rectangles"""
+        from config import cards_config
+        
+        if not collected_cards:
+            return
+        
+        # Position below speed level on left side
+        start_x = self.hold_panel_x
+        start_y = self.hold_panel_y + 180  # Below hold panel
+        
+        # Card rectangle dimensions
+        card_width = 25
+        card_height = 35
+        cards_per_row = 6
+        spacing_x = 3
+        spacing_y = 3
+        
+        # Draw "CARDS" label
+        label = self.font_small.render("CARDS", True, self.text_gold)
+        self.screen.blit(label, (start_x + 10, start_y))
+        start_y += 25
+        
+        # Draw each collected card as a colored rectangle
+        for i, card in enumerate(collected_cards):
+            row = i // cards_per_row
+            col = i % cards_per_row
+            
+            x = start_x + col * (card_width + spacing_x)
+            y = start_y + row * (card_height + spacing_y)
+            
+            # Get border color for this card type
+            card_type = card.type.value
+            border_color = cards_config.get_card_color(card_type, "border")
+            bg_color = cards_config.get_card_color(card_type, "background")
+            
+            # Draw background rectangle
+            pygame.draw.rect(self.screen, bg_color, 
+                           (x, y, card_width, card_height))
+            
+            # Draw border
+            pygame.draw.rect(self.screen, border_color, 
+                           (x, y, card_width, card_height), 2)
     
     def _draw_piece_preview(self, piece: IPiece, panel_x: int, panel_y: int, 
                            panel_width: int, panel_height: int) -> None:

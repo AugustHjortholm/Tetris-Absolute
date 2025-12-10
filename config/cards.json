@@ -1,0 +1,395 @@
+{
+  "card_selection": {
+    "cards_per_selection": 3,
+    "lines_between_selections": 10
+  },
+  "card_colors": {
+    "blue": {
+      "background": "#1E3A5F",
+      "border": "#4DA6FF",
+      "text": "#FFFFFF",
+      "highlight": "#66B3FF"
+    },
+    "green": {
+      "background": "#1E4A2E",
+      "border": "#4ADE80",
+      "text": "#FFFFFF",
+      "highlight": "#6EE7A0"
+    },
+    "red": {
+      "background": "#4A1E1E",
+      "border": "#EF4444",
+      "text": "#FFFFFF",
+      "highlight": "#F87171"
+    },
+    "orange": {
+      "background": "#4A3A1E",
+      "border": "#F59E0B",
+      "text": "#FFFFFF",
+      "highlight": "#FBBF24"
+    },
+    "grey": {
+      "background": "#2E2E2E",
+      "border": "#9CA3AF",
+      "text": "#FFFFFF",
+      "highlight": "#D1D5DB"
+    }
+  },
+  "blue_cards": [
+    {
+      "id": "piece_long5",
+      "name": "Long Bar+",
+      "description": "5-block long piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+      ],
+      "piece_color": "#00CED1",
+      "rarity": 1.0
+    },
+    {
+      "id": "piece_u",
+      "name": "U-Block",
+      "description": "U-shaped piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [1, 0, 1],
+        [1, 1, 1],
+        [0, 0, 0]
+      ],
+      "piece_color": "#FF69B4",
+      "rarity": 1.0
+    },
+    {
+      "id": "piece_plus",
+      "name": "Plus Block",
+      "description": "Plus-shaped piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 1, 0]
+      ],
+      "piece_color": "#9370DB",
+      "rarity": 0.8
+    },
+    {
+      "id": "piece_corner",
+      "name": "Corner Block",
+      "description": "Large L-shaped piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [1, 0, 0],
+        [1, 0, 0],
+        [1, 1, 1]
+      ],
+      "piece_color": "#20B2AA",
+      "rarity": 1.0
+    },
+    {
+      "id": "piece_2x2_corner",
+      "name": "Wide Corner",
+      "description": "2x2 corner piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [1, 1, 0],
+        [1, 1, 0],
+        [1, 1, 1]
+      ],
+      "piece_color": "#CD853F",
+      "rarity": 0.7
+    },
+    {
+      "id": "piece_zigzag",
+      "name": "Long Zigzag",
+      "description": "Extended S-piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [0, 0, 1, 1],
+        [0, 1, 1, 0],
+        [1, 1, 0, 0],
+        [0, 0, 0, 0]
+      ],
+      "piece_color": "#32CD32",
+      "rarity": 0.9
+    },
+    {
+      "id": "piece_mini",
+      "name": "Mini Block",
+      "description": "Tiny 2-block piece",
+      "speed_change": 1,
+      "piece_shape": [
+        [1, 1]
+      ],
+      "piece_color": "#FFD700",
+      "rarity": 0.6
+    },
+    {
+      "id": "piece_single",
+      "name": "Dot Block",
+      "description": "Single block piece",
+      "speed_change": 0,
+      "piece_shape": [
+        [1]
+      ],
+      "piece_color": "#FF4500",
+      "rarity": 0.5
+    }
+  ],
+  "green_cards": [
+    {
+      "id": "combo_bonus_4",
+      "name": "Combo Master",
+      "description": "+3x multiplier to combo 4+",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 3,
+      "effect_id": "combo_bonus",
+      "effect_value": {
+        "min_combo": 4,
+        "multiplier_bonus": 3.0
+      },
+      "rarity": 1.0
+    },
+    {
+      "id": "tetris_bonus",
+      "name": "Tetris Pro",
+      "description": "+0.5x Tetris multiplier",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 4,
+      "effect_id": "tetris_bonus",
+      "effect_value": 0.5,
+      "rarity": 1.0
+    },
+    {
+      "id": "back_to_back_bonus",
+      "name": "B2B Specialist",
+      "description": "+1.0x Back-to-Back bonus",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 3,
+      "effect_id": "b2b_bonus",
+      "effect_value": 1.0,
+      "rarity": 0.8
+    },
+    {
+      "id": "line_clear_bonus",
+      "name": "Line Clearer",
+      "description": "+50 points per line",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 5,
+      "effect_id": "line_bonus",
+      "effect_value": 50,
+      "rarity": 1.0
+    },
+    {
+      "id": "hard_drop_bonus",
+      "name": "Speed Dropper",
+      "description": "+3 points per hard drop cell",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 4,
+      "effect_id": "hard_drop_bonus",
+      "effect_value": 3,
+      "rarity": 0.9
+    },
+    {
+      "id": "double_bonus",
+      "name": "Double Lover",
+      "description": "+200 points for doubles",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 3,
+      "effect_id": "double_bonus",
+      "effect_value": 200,
+      "rarity": 1.0
+    },
+    {
+      "id": "triple_bonus",
+      "name": "Triple Threat",
+      "description": "+400 points for triples",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 3,
+      "effect_id": "triple_bonus",
+      "effect_value": 400,
+      "rarity": 0.9
+    }
+  ],
+  "red_cards": [
+    {
+      "id": "frozen_line",
+      "name": "Frozen Foundation",
+      "description": "Bottom line is frozen",
+      "speed_change": -1,
+      "effect_id": "frozen_line",
+      "effect_value": 1,
+      "rarity": 1.0
+    },
+    {
+      "id": "no_hold",
+      "name": "No Storage",
+      "description": "Cannot use hold function",
+      "speed_change": -2,
+      "effect_id": "disable_hold",
+      "effect_value": true,
+      "rarity": 0.8
+    },
+    {
+      "id": "random_hole",
+      "name": "Unstable Ground",
+      "description": "Random hole every 5 pieces",
+      "speed_change": -1,
+      "effect_id": "random_hole",
+      "effect_value": 5,
+      "rarity": 0.9
+    },
+    {
+      "id": "no_ghost",
+      "name": "Blind Drop",
+      "description": "Ghost piece disabled",
+      "speed_change": -1,
+      "effect_id": "disable_ghost",
+      "effect_value": true,
+      "rarity": 1.0
+    },
+    {
+      "id": "shorter_lock",
+      "name": "Quick Lock",
+      "description": "Lock delay reduced by 50%",
+      "speed_change": -1,
+      "effect_id": "lock_delay_mult",
+      "effect_value": 0.5,
+      "rarity": 0.8
+    },
+    {
+      "id": "narrower_well",
+      "name": "Tight Squeeze",
+      "description": "Left column filled with blocks",
+      "speed_change": -2,
+      "effect_id": "fill_column",
+      "effect_value": 0,
+      "rarity": 0.6
+    },
+    {
+      "id": "piece_limit",
+      "name": "Piece Drought",
+      "description": "One less piece type in bag",
+      "speed_change": -1,
+      "effect_id": "remove_piece_type",
+      "effect_value": "random",
+      "rarity": 0.7
+    }
+  ],
+  "orange_cards": [
+    {
+      "id": "mega_combo",
+      "name": "MEGA COMBO",
+      "description": "+5x multiplier to combo 3+",
+      "speed_change": 2,
+      "stackable": true,
+      "max_stack": 2,
+      "effect_id": "combo_bonus",
+      "effect_value": {
+        "min_combo": 3,
+        "multiplier_bonus": 5.0
+      },
+      "rarity": 0.3
+    },
+    {
+      "id": "super_tetris",
+      "name": "SUPER TETRIS",
+      "description": "+2.0x Tetris multiplier",
+      "speed_change": 3,
+      "stackable": true,
+      "max_stack": 2,
+      "effect_id": "tetris_bonus",
+      "effect_value": 2.0,
+      "rarity": 0.2
+    },
+    {
+      "id": "score_doubler",
+      "name": "DOUBLE UP",
+      "description": "All scores x2",
+      "speed_change": 3,
+      "stackable": false,
+      "effect_id": "score_multiplier",
+      "effect_value": 2.0,
+      "rarity": 0.15
+    },
+    {
+      "id": "extra_lock",
+      "name": "INFINITE SPIN",
+      "description": "Lock delay x3",
+      "speed_change": 2,
+      "stackable": false,
+      "effect_id": "lock_delay_mult",
+      "effect_value": 3.0,
+      "rarity": 0.25
+    },
+    {
+      "id": "clear_board",
+      "name": "FRESH START",
+      "description": "Clear the entire board",
+      "speed_change": 2,
+      "stackable": false,
+      "effect_id": "clear_board",
+      "effect_value": true,
+      "rarity": 0.2
+    }
+  ],
+  "grey_cards": [
+    {
+      "id": "remove_card",
+      "name": "Reconsider",
+      "description": "Remove one of your cards",
+      "speed_change": 1,
+      "effect_id": "remove_card",
+      "effect_value": 1,
+      "rarity": 1.0
+    },
+    {
+      "id": "upgrade_green",
+      "name": "Enhance",
+      "description": "Double a green card's effect",
+      "speed_change": 1,
+      "effect_id": "upgrade_card",
+      "effect_value": "green",
+      "rarity": 0.7
+    },
+    {
+      "id": "remove_red",
+      "name": "Purify",
+      "description": "Remove all red card effects",
+      "speed_change": 2,
+      "effect_id": "remove_type",
+      "effect_value": "red",
+      "rarity": 0.5
+    },
+    {
+      "id": "reroll_all",
+      "name": "Mulligan",
+      "description": "Reroll all 3 card choices",
+      "speed_change": 1,
+      "effect_id": "reroll_choices",
+      "effect_value": true,
+      "rarity": 0.8
+    },
+    {
+      "id": "duplicate_last",
+      "name": "Echo",
+      "description": "Copy your last picked card",
+      "speed_change": 1,
+      "effect_id": "duplicate_last",
+      "effect_value": true,
+      "rarity": 0.6
+    }
+  ]
+}
+

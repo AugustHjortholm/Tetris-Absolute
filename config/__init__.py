@@ -7,6 +7,7 @@ from typing import Dict, Any, Tuple
 # Default paths
 CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
 GAME_CONFIG_PATH = os.path.join(CONFIG_DIR, "game_config.json")
+CARDS_CONFIG_PATH = os.path.join(CONFIG_DIR, "cards.json")
 LANG_DIR = os.path.join(CONFIG_DIR, "lang")
 
 
@@ -135,6 +136,65 @@ class GameConfig:
         return self._config["menu"]["version"]
 
 
+class CardsConfig:
+    """Manages card configuration loaded from JSON."""
+    
+    _instance = None
+    _config = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._load_config()
+        return cls._instance
+    
+    def _load_config(self):
+        """Load the cards configuration from JSON file."""
+        self._config = load_json(CARDS_CONFIG_PATH)
+    
+    def reload(self):
+        """Reload the configuration from disk."""
+        self._load_config()
+    
+    @property
+    def cards_per_selection(self) -> int:
+        return self._config["card_selection"]["cards_per_selection"]
+    
+    @property
+    def lines_between_selections(self) -> int:
+        return self._config["card_selection"]["lines_between_selections"]
+    
+    def get_card_color(self, card_type: str, color_name: str) -> Tuple[int, int, int]:
+        """Get RGB color for a card type element."""
+        hex_color = self._config["card_colors"][card_type].get(color_name, "#FFFFFF")
+        return hex_to_rgb(hex_color)
+    
+    @property
+    def all_cards(self) -> Dict[str, Any]:
+        """Get all card data for loading into CardManager."""
+        return self._config
+    
+    @property
+    def blue_cards(self) -> list:
+        return self._config.get("blue_cards", [])
+    
+    @property
+    def green_cards(self) -> list:
+        return self._config.get("green_cards", [])
+    
+    @property
+    def red_cards(self) -> list:
+        return self._config.get("red_cards", [])
+    
+    @property
+    def orange_cards(self) -> list:
+        return self._config.get("orange_cards", [])
+    
+    @property
+    def grey_cards(self) -> list:
+        return self._config.get("grey_cards", [])
+
+
 class Localization:
     """Manages localized text loaded from JSON."""
     
@@ -185,4 +245,5 @@ class Localization:
 # Singleton instances
 game_config = GameConfig()
 localization = Localization()
+cards_config = CardsConfig()
 
