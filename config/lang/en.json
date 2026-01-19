@@ -5,6 +5,7 @@
   },
   "menu": {
     "new_game": "NEW GAME",
+    "card_collection": "CARD COLLECTION",
     "custom_game": "CUSTOM GAME",
     "challenges": "CHALLENGES",
     "options": "OPTIONS",
@@ -12,6 +13,19 @@
     "coming_soon": "Coming Soon",
     "controls_keyboard": "Arrow Keys: Navigate  |  Enter: Select  |  Esc: Exit",
     "controls_controller": "D-Pad: Navigate  |  X: Select  |  Circle: Back"
+  },
+  "collection": {
+    "title": "CARD COLLECTION",
+    "stats_summary": "Cards Discovered: {used}/{total}  |  Total Selections: {selections}",
+    "filter_label": "Filter:",
+    "sort_label": "Sort:",
+    "sort_alpha": "A-Z",
+    "sort_color": "Type",
+    "sort_used": "Used",
+    "no_cards": "No cards match the current filters",
+    "times_selected": "Selected: {count}x",
+    "controls_keyboard": "Arrow Keys: Navigate  |  Enter: Toggle  |  Mouse: Click  |  Esc: Back",
+    "controls_controller": "D-Pad: Navigate  |  X: Toggle  |  Circle: Back"
   },
   "ui": {
     "score": "SCORE",

@@ -13,6 +13,7 @@ class MenuState(Enum):
     """Menu states"""
     MAIN_MENU = auto()
     IN_GAME = auto()
+    CARD_COLLECTION = auto()
     CUSTOM_GAME = auto()
     CHALLENGES = auto()
     OPTIONS = auto()
@@ -62,6 +63,7 @@ class MainMenu:
         # Menu items with localized text
         self.menu_items: List[MenuItem] = [
             MenuItem(localization.get("menu", "new_game"), self._start_new_game, True),
+            MenuItem(localization.get("menu", "card_collection"), self._card_collection, True),
             MenuItem(localization.get("menu", "custom_game"), self._custom_game, False),
             MenuItem(localization.get("menu", "challenges"), self._challenges, False),
             MenuItem(localization.get("menu", "options"), self._options, False),
@@ -84,6 +86,10 @@ class MainMenu:
     def _start_new_game(self):
         """Start a new game"""
         self.state = MenuState.IN_GAME
+    
+    def _card_collection(self):
+        """Open the card collection menu"""
+        self.state = MenuState.CARD_COLLECTION
     
     def _custom_game(self):
         """Custom game - not implemented"""

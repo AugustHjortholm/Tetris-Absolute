@@ -13,6 +13,7 @@ from core.interfaces import (
     IRenderer, IInputHandler, IScoringSystem
 )
 from core.cards import CardManager, CardData
+from core.card_stats import get_card_stats
 from config import game_config, cards_config
 from implementations.card_effects import (
     GameModifiers, get_modifiers, set_modifiers, apply_card_effect
@@ -304,6 +305,9 @@ class Game:
         
         selected_card = self.card_renderer.get_selected_card(self.pending_cards)
         if selected_card:
+            # Track the selection in persistent stats
+            get_card_stats().record_selection(selected_card.id)
+            
             # Check for reroll grey card - handle specially
             if selected_card.effect_id == "reroll_choices":
                 # Collect the grey card first

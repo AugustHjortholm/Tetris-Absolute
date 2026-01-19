@@ -356,3 +356,5 @@ class TestScoreCalculation:
         # (800 + 4*50) * 1.5 (tetris) * 1.5 (multiplier) = 1000 * 1.5 * 1.5 = 2250
         assert score == 2250
 
+
+

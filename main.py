@@ -6,6 +6,7 @@ This is where we wire up all the dependencies (dependency injection).
 import pygame
 from game import Game
 from menu import MainMenu, MenuState
+from card_collection_menu import CardCollectionMenu
 from implementations.standard_board import StandardBoard
 from implementations.seven_bag_generator import SevenBagGenerator
 from implementations.standard_game_state import StandardGameState
@@ -114,6 +115,11 @@ def main():
             return_to_menu = run_game(screen, clock, fps, use_controller)
             if not return_to_menu:
                 running = False
+        elif menu_result == MenuState.CARD_COLLECTION:
+            # Show card collection menu
+            collection_menu = CardCollectionMenu(screen)
+            collection_menu.run()
+            # Returns to main menu after
         else:
             # Menu was exited (quit)
             running = False
