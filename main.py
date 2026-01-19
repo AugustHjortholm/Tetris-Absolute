@@ -5,6 +5,7 @@ This is where we wire up all the dependencies (dependency injection).
 
 import pygame
 from game import Game
+from menu import MainMenu, MenuState
 from implementations.standard_board import StandardBoard
 from implementations.seven_bag_generator import SevenBagGenerator
 from implementations.standard_game_state import StandardGameState
@@ -12,6 +13,68 @@ from implementations.pygame_renderer import PygameRenderer
 from implementations.keyboard_input_handler import KeyboardInputHandler
 from implementations.controller_input_handler import ControllerInputHandler
 from implementations.standard_scoring_system import StandardScoringSystem
+from implementations.card_renderer import CardRenderer
+
+
+def create_game(screen, use_controller: bool) -> Game:
+    """Create a new game instance with all dependencies"""
+    board = StandardBoard(width=10, height=20)
+    piece_generator = SevenBagGenerator()
+    game_state = StandardGameState()
+    
+    if use_controller:
+        input_handler = ControllerInputHandler()
+    else:
+        input_handler = KeyboardInputHandler()
+    
+    renderer = PygameRenderer(screen, cell_size=30, use_controller=use_controller)
+    scoring_system = StandardScoringSystem()
+    
+    # Create card renderer for roguelike card selection
+    card_renderer = CardRenderer(screen)
+    
+    game = Game(
+        board=board,
+        piece_generator=piece_generator,
+        game_state=game_state,
+        renderer=renderer,
+        input_handler=input_handler,
+        scoring_system=scoring_system
+    )
+    
+    # Attach card renderer to game
+    game.card_renderer = card_renderer
+    
+    return game
+
+
+def run_game(screen, clock, fps: int, use_controller: bool):
+    """Run a game session. Returns True if should return to menu, False to quit."""
+    game = create_game(screen, use_controller)
+    game.start()
+    
+    print("\nGame started!")
+    
+    # Main game loop
+    running = True
+    while running:
+        # Handle input
+        running = game.handle_input()
+        
+        # Check if game requested return to menu
+        if game.return_to_menu:
+            return True  # Return to menu
+        
+        # Update game state
+        game.update()
+        
+        # Render
+        game.render()
+        
+        # Control framerate
+        clock.tick(fps)
+    
+    return False  # Quit entirely
 
 
 def main():
@@ -29,82 +92,36 @@ def main():
     clock = pygame.time.Clock()
     fps = 60
     
-    # Create all game components (dependency injection)
-    board = StandardBoard(width=10, height=20)
-    piece_generator = SevenBagGenerator()
-    game_state = StandardGameState()
-    
     # Auto-detect controller or use keyboard
     use_controller = ControllerInputHandler.is_controller_connected()
     
     if use_controller:
         print("\n=== Controller Mode ===")
-        input_handler = ControllerInputHandler()
+        controller = ControllerInputHandler()
+        print(f"Controller: {controller.controller_name}")
     else:
         print("\n=== Keyboard Mode ===")
-        input_handler = KeyboardInputHandler()
     
-    renderer = PygameRenderer(screen, cell_size=30, use_controller=use_controller)
-    scoring_system = StandardScoringSystem()
-    
-    # Create the game
-    game = Game(
-        board=board,
-        piece_generator=piece_generator,
-        game_state=game_state,
-        renderer=renderer,
-        input_handler=input_handler,
-        scoring_system=scoring_system
-    )
-    
-    # Start the game
-    game.start()
-    
-    print("\nGame started!")
-    print("\n=== Controls ===")
-    
-    if isinstance(input_handler, ControllerInputHandler):
-        print("Controller Controls:")
-        print("  D-Pad Left: Move left")
-        print("  D-Pad Right: Move right")
-        print("  Square: Rotate clockwise")
-        print("  Cross (X): Rotate counter-clockwise")
-        print("  D-Pad Down: Soft drop (hold)")
-        print("  D-Pad Up: Hard drop (instant)")
-        print("  L1 / R1: Hold/Store piece")
-        print("  Options / Triangle: Pause")
-        print("  Share: Restart")
-        print("\nAlternatives: Left Stick for movement")
-    else:
-        print("Keyboard Controls:")
-        print("  Left/Right Arrows: Move piece")
-        print("  A/Z: Rotate left")
-        print("  D: Rotate right")
-        print("  Up Arrow: Soft drop (hold to continuously drop)")
-        print("  Down Arrow: Hard drop (instant)")
-        print("  C/Shift: Hold/Store piece")
-        print("  P: Pause")
-        print("  R: Restart")
-    
-    # Main game loop
+    # Main application loop
     running = True
     while running:
-        # Handle input
-        running = game.handle_input()
+        # Show main menu
+        menu = MainMenu(screen)
+        menu_result = menu.run()
         
-        # Update game state
-        game.update()
-        
-        # Render
-        game.render()
-        
-        # Control framerate
-        clock.tick(fps)
+        if menu_result == MenuState.IN_GAME:
+            # Run the game
+            return_to_menu = run_game(screen, clock, fps, use_controller)
+            if not return_to_menu:
+                running = False
+        else:
+            # Menu was exited (quit)
+            running = False
     
     # Clean up
     pygame.quit()
+    print("\nThanks for playing!")
 
 
 if __name__ == "__main__":
     main()
-

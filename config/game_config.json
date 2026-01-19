@@ -1,0 +1,148 @@
+{
+  "scoring": {
+    "base_scores": {
+      "single": 100,
+      "double": 300,
+      "triple": 500,
+      "tetris": 800
+    },
+    "multipliers": {
+      "tetris": 1.2,
+      "back_to_back": 1.5,
+      "combo_per_level": 0.1
+    },
+    "drop_points": {
+      "soft_drop": 1,
+      "hard_drop": 2
+    }
+  },
+  "speed": {
+    "base_drop_interval": 1.0,
+    "min_drop_interval": 0.1,
+    "speed_decrease_per_level": 0.05,
+    "soft_drop_multiplier": 10.0,
+    "lines_per_level": 10
+  },
+  "lock_delay": {
+    "base_delay": 1.0,
+    "max_delay": 3.0,
+    "soft_drop_multiplier": 10.0
+  },
+  "das": {
+    "delay_ms": 300,
+    "repeat_ms": 100
+  },
+  "colors": {
+    "pieces": {
+      "I": "#00FFFF",
+      "J": "#0000FF",
+      "L": "#FFA500",
+      "O": "#FFFF00",
+      "S": "#00FF00",
+      "T": "#800080",
+      "Z": "#FF0000"
+    },
+    "ui": {
+      "background": "#141428",
+      "grid": "#282850",
+      "panel_background": "#1E1E32",
+      "text_primary": "#FFFFFF",
+      "text_gold": "#FFD700",
+      "text_tetris": "#00FFFF",
+      "text_back_to_back": "#FF64FF",
+      "text_combo": "#FFA500",
+      "text_combo_multiplier": "#FFFF64",
+      "ghost_piece_alpha": 0.3
+    },
+    "game_over": {
+      "overlay_alpha": 180,
+      "text": "#FF0000"
+    },
+    "pause": {
+      "overlay_alpha": 51,
+      "text": "#FFFFFF"
+    }
+  },
+  "board": {
+    "width": 10,
+    "height": 20,
+    "cell_size": 30
+  },
+  "notifications": {
+    "duration": 1.5
+  },
+  "menu": {
+    "colors": {
+      "background": "#0F0A23",
+      "title": "#00FFFF",
+      "text": "#FFFFFF",
+      "selected": "#FFD700",
+      "disabled": "#646464",
+      "button_background": "#1E143C",
+      "button_hover": "#32235A",
+      "button_border": "#6450A0",
+      "grid_line": "#191232",
+      "grid_highlight": "#231941"
+    },
+    "grid": {
+      "cell_size": 60
+    },
+    "input": {
+      "cooldown_ms": 200
+    },
+    "version": "v0.1.0 - Dev Build"
+  },
+  "pieces": {
+    "I": {
+      "shape": [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+      ]
+    },
+    "J": {
+      "shape": [
+        [1, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+      ]
+    },
+    "L": {
+      "shape": [
+        [0, 0, 1],
+        [1, 1, 1],
+        [0, 0, 0]
+      ]
+    },
+    "O": {
+      "shape": [
+        [1, 1],
+        [1, 1]
+      ]
+    },
+    "S": {
+      "shape": [
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0]
+      ]
+    },
+    "T": {
+      "shape": [
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 0, 0]
+      ]
+    },
+    "Z": {
+      "shape": [
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0]
+      ]
+    }
+  }
+}
+

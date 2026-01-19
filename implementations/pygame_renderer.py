@@ -1,18 +1,20 @@
 """
 Pygame-based renderer for the Tetris game.
+Colors and text loaded from config files.
 """
 
 import pygame
 from typing import Tuple, Optional
 from core.interfaces import IRenderer, IBoard, IPiece, IGameState
+from config import game_config, localization
 
 
 class PygameRenderer(IRenderer):
-    """Pygame implementation of the renderer"""
+    """Pygame implementation of the renderer using config values"""
     
-    def __init__(self, screen: pygame.Surface, cell_size: int = 30, use_controller: bool = False):
+    def __init__(self, screen: pygame.Surface, cell_size: int = None, use_controller: bool = False):
         self.screen = screen
-        self.cell_size = cell_size
+        self.cell_size = cell_size or game_config.board["cell_size"]
         self.use_controller = use_controller
         
         # Calculate layout
@@ -22,7 +24,7 @@ class PygameRenderer(IRenderer):
         self.board_y = 20
         
         # Side panel position (right side)
-        self.panel_x = self.board_x + 10 * cell_size + 40
+        self.panel_x = self.board_x + game_config.board["width"] * self.cell_size + 40
         self.panel_y = 20
         
         self.hold_panel_y = 20
@@ -33,19 +35,24 @@ class PygameRenderer(IRenderer):
         self.font_medium = pygame.font.Font(None, 36)
         self.font_small = pygame.font.Font(None, 24)
         
-        # Colors
-        self.bg_color = (20, 20, 40)
-        self.grid_color = (40, 40, 60)
-        self.text_color = (255, 255, 255)
-        self.panel_bg = (30, 30, 50)
+        # Colors from config
+        self.bg_color = game_config.get_ui_color("background")
+        self.grid_color = game_config.get_ui_color("grid")
+        self.text_color = game_config.get_ui_color("text_primary")
+        self.panel_bg = game_config.get_ui_color("panel_background")
+        self.text_gold = game_config.get_ui_color("text_gold")
+        self.text_tetris = game_config.get_ui_color("text_tetris")
+        self.text_b2b = game_config.get_ui_color("text_back_to_back")
+        self.text_combo = game_config.get_ui_color("text_combo")
+        self.text_combo_mult = game_config.get_ui_color("text_combo_multiplier")
         
         # Points notification
         self.points_notification = None  # (points, start_time, special_type)
-        self.points_notification_duration = 1.5  # seconds to show notification
+        self.points_notification_duration = game_config.notification_duration
         
         # Combo notification
         self.combo_notification = None  # (combo_count, start_time, multiplier)
-        self.combo_notification_duration = 1.5  # seconds to show combo
+        self.combo_notification_duration = game_config.notification_duration
     
     def clear(self) -> None:
         """Clear the screen"""
@@ -94,26 +101,99 @@ class PygameRenderer(IRenderer):
         pygame.draw.rect(self.screen, self.grid_color, panel_rect, 2)
         
         # Draw "NEXT" label
-        label = self.font_small.render("NEXT", True, (255, 215, 0))
+        label = self.font_small.render(localization.get("ui", "next"), True, self.text_gold)
         self.screen.blit(label, (self.panel_x + 10, self.panel_y + 270))
         
         # Draw the piece centered in the panel
         self._draw_piece_preview(piece, self.panel_x, self.panel_y + 320, 160, 120)
     
-    def render_held_piece(self, piece: Optional[IPiece]) -> None:
+    def render_held_piece(self, piece: Optional[IPiece], disabled: bool = False) -> None:
         """Render the held piece preview"""
         # Draw panel background
         panel_rect = pygame.Rect(self.hold_panel_x, self.hold_panel_y, 160, 160)
         pygame.draw.rect(self.screen, self.panel_bg, panel_rect)
         pygame.draw.rect(self.screen, self.grid_color, panel_rect, 2)
         
-        # Draw "HOLD" label
-        label = self.font_small.render("HOLD (L1/R1)", True, (255, 215, 0))
+        # Draw "HOLD" label (red if disabled)
+        label_color = (255, 100, 100) if disabled else self.text_gold
+        label = self.font_small.render(localization.get("ui", "hold"), True, label_color)
         self.screen.blit(label, (self.hold_panel_x + 10, self.hold_panel_y + 10))
         
         # Draw the piece if one is held
-        if piece is not None:
+        if piece is not None and not disabled:
             self._draw_piece_preview(piece, self.hold_panel_x, self.hold_panel_y + 40, 160, 120)
+        elif disabled:
+            # Draw X over the hold panel
+            x1, y1 = self.hold_panel_x + 30, self.hold_panel_y + 50
+            x2, y2 = self.hold_panel_x + 130, self.hold_panel_y + 140
+            pygame.draw.line(self.screen, (255, 100, 100), (x1, y1), (x2, y2), 3)
+            pygame.draw.line(self.screen, (255, 100, 100), (x2, y1), (x1, y2), 3)
+    
+    def render_speed_level(self, speed_level: int) -> None:
+        """Render the current card speed level"""
+        # Position above controls
+        y = self.panel_y + 470
+        
+        # Draw speed level indicator
+        label = self.font_small.render("SPEED", True, self.text_gold)
+        self.screen.blit(label, (self.hold_panel_x + 10, y))
+        
+        # Speed value with color based on level
+        if speed_level <= 3:
+            color = (100, 255, 100)  # Green - easy
+        elif speed_level <= 6:
+            color = (255, 255, 100)  # Yellow - medium
+        elif speed_level <= 9:
+            color = (255, 165, 0)  # Orange - hard
+        else:
+            color = (255, 100, 100)  # Red - very hard
+        
+        value = self.font_medium.render(str(speed_level), True, color)
+        self.screen.blit(value, (self.hold_panel_x + 10, y + 22))
+    
+    def render_collected_cards(self, collected_cards: list) -> None:
+        """Render the list of collected cards as colored rectangles"""
+        from config import cards_config
+        
+        if not collected_cards:
+            return
+        
+        # Position below speed level on left side
+        start_x = self.hold_panel_x
+        start_y = self.hold_panel_y + 180  # Below hold panel
+        
+        # Card rectangle dimensions
+        card_width = 25
+        card_height = 35
+        cards_per_row = 6
+        spacing_x = 3
+        spacing_y = 3
+        
+        # Draw "CARDS" label
+        label = self.font_small.render("CARDS", True, self.text_gold)
+        self.screen.blit(label, (start_x + 10, start_y))
+        start_y += 25
+        
+        # Draw each collected card as a colored rectangle
+        for i, card in enumerate(collected_cards):
+            row = i // cards_per_row
+            col = i % cards_per_row
+            
+            x = start_x + col * (card_width + spacing_x)
+            y = start_y + row * (card_height + spacing_y)
+            
+            # Get border color for this card type
+            card_type = card.type.value
+            border_color = cards_config.get_card_color(card_type, "border")
+            bg_color = cards_config.get_card_color(card_type, "background")
+            
+            # Draw background rectangle
+            pygame.draw.rect(self.screen, bg_color, 
+                           (x, y, card_width, card_height))
+            
+            # Draw border
+            pygame.draw.rect(self.screen, border_color, 
+                           (x, y, card_width, card_height), 2)
     
     def _draw_piece_preview(self, piece: IPiece, panel_x: int, panel_y: int, 
                            panel_width: int, panel_height: int) -> None:
@@ -145,38 +225,56 @@ class PygameRenderer(IRenderer):
         y_offset = self.panel_y
         
         # Score
-        self._draw_stat_panel("SCORE", str(state.score), y_offset)
+        self._draw_stat_panel(localization.get("ui", "score"), str(state.score), y_offset)
         y_offset += 80
         
         # Level
-        self._draw_stat_panel("LEVEL", str(state.level), y_offset)
+        self._draw_stat_panel(localization.get("ui", "level"), str(state.level), y_offset)
         y_offset += 80
         
         # Lines
-        self._draw_stat_panel("LINES", str(state.lines), y_offset)
+        self._draw_stat_panel(localization.get("ui", "lines"), str(state.lines), y_offset)
         
         # Controls (at bottom)
         self._draw_controls()
     
     def render_game_over(self) -> None:
         """Render game over screen"""
-        # Semi-transparent overlay
+        # Semi-transparent overlay from config
         overlay = pygame.Surface(self.screen.get_size())
-        overlay.set_alpha(180)
+        overlay.set_alpha(game_config.get_game_over_color("overlay_alpha"))
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
         
-        # "GAME OVER" text
-        game_over_text = self.font_large.render("GAME OVER", True, (255, 0, 0))
+        # "GAME OVER" text from localization
+        game_over_color = game_config.get_ui_color("text_primary")
+        # Try to get game over specific color, fallback to red
+        try:
+            game_over_color = game_config.get_game_over_color("text")
+            if isinstance(game_over_color, str):
+                from config import hex_to_rgb
+                game_over_color = hex_to_rgb(game_over_color)
+        except:
+            game_over_color = (255, 0, 0)
+        
+        game_over_text = self.font_large.render(
+            localization.get("game_states", "game_over"), 
+            True, 
+            game_over_color
+        )
         text_rect = game_over_text.get_rect(center=(self.screen.get_width() // 2, 
                                                      self.screen.get_height() // 2 - 30))
         self.screen.blit(game_over_text, text_rect)
         
-        # "Press R to restart" text
-        restart_text = self.font_small.render("Press R to restart", True, (255, 255, 255))
-        restart_rect = restart_text.get_rect(center=(self.screen.get_width() // 2, 
-                                                     self.screen.get_height() // 2 + 30))
-        self.screen.blit(restart_text, restart_rect)
+        # "Press R for Menu" text from localization
+        menu_text = self.font_small.render(
+            localization.get("game_states", "press_menu"), 
+            True, 
+            self.text_color
+        )
+        menu_rect = menu_text.get_rect(center=(self.screen.get_width() // 2, 
+                                                self.screen.get_height() // 2 + 30))
+        self.screen.blit(menu_text, menu_rect)
     
     def show_points_notification(self, points: int, special_type: str = None) -> None:
         """Show a points notification for line clears"""
@@ -206,13 +304,13 @@ class PygameRenderer(IRenderer):
         
         # Determine color and text based on special type
         if special_type == "back_to_back":
-            color = (255, 100, 255)  # Magenta/Pink for back-to-back
-            special_text = "BACK-TO-BACK!"
+            color = self.text_b2b
+            special_text = localization.get("notifications", "back_to_back")
         elif special_type == "tetris":
-            color = (0, 255, 255)  # Cyan for Tetris
-            special_text = "TETRIS!"
+            color = self.text_tetris
+            special_text = localization.get("notifications", "tetris")
         else:
-            color = (255, 215, 0)  # Gold for normal clears
+            color = self.text_gold
             special_text = None
         
         # Render points text
@@ -255,9 +353,9 @@ class PygameRenderer(IRenderer):
         alpha = int(255 * (1 - elapsed / self.combo_notification_duration))
         
         # Render combo text with multiplier
-        combo_text = f"x{combo_count} COMBO!"
-        multiplier_text = f"{multiplier:.1f}x"
-        color = (255, 165, 0)  # Orange for combo
+        combo_text = localization.get("notifications", "combo", count=combo_count)
+        multiplier_text = localization.get("notifications", "multiplier", value=f"{multiplier:.1f}")
+        color = self.text_combo
         
         # Combo text
         text_surface = self.font_small.render(combo_text, True, color)
@@ -266,7 +364,7 @@ class PygameRenderer(IRenderer):
         text_with_alpha.set_alpha(alpha)
         
         # Multiplier text
-        mult_surface = self.font_small.render(multiplier_text, True, (255, 255, 100))  # Yellow
+        mult_surface = self.font_small.render(multiplier_text, True, self.text_combo_mult)
         mult_with_alpha = pygame.Surface(mult_surface.get_size(), pygame.SRCALPHA)
         mult_with_alpha.blit(mult_surface, (0, 0))
         mult_with_alpha.set_alpha(alpha)
@@ -280,14 +378,19 @@ class PygameRenderer(IRenderer):
     
     def render_paused(self) -> None:
         """Render pause overlay with darkened screen"""
-        # Semi-transparent dark overlay (20% brightness reduction = 51 alpha for black overlay)
+        # Semi-transparent dark overlay from config
         overlay = pygame.Surface(self.screen.get_size())
-        overlay.set_alpha(51)  # 20% of 255 ≈ 51
+        overlay.set_alpha(game_config.get_pause_color("overlay_alpha"))
         overlay.fill((0, 0, 0))
         self.screen.blit(overlay, (0, 0))
         
-        # "PAUSED" text
-        paused_text = self.font_large.render("PAUSED", True, (255, 255, 255))
+        # "PAUSED" text from localization
+        pause_color = game_config.get_ui_color("text_primary")
+        paused_text = self.font_large.render(
+            localization.get("game_states", "paused"), 
+            True, 
+            pause_color
+        )
         text_rect = paused_text.get_rect(center=(self.screen.get_width() // 2, 
                                                   self.screen.get_height() // 2))
         self.screen.blit(paused_text, text_rect)
@@ -342,7 +445,7 @@ class PygameRenderer(IRenderer):
         pygame.draw.rect(self.screen, self.grid_color, panel_rect, 2)
         
         # Label
-        label_text = self.font_small.render(label, True, (255, 215, 0))
+        label_text = self.font_small.render(label, True, self.text_gold)
         self.screen.blit(label_text, (self.panel_x + 10, y + 10))
         
         # Value
@@ -359,28 +462,23 @@ class PygameRenderer(IRenderer):
         pygame.draw.rect(self.screen, self.grid_color, panel_rect, 2)
         
         # Title
-        title = self.font_small.render("CONTROLS", True, (255, 215, 0))
+        title = self.font_small.render(localization.get("ui", "controls"), True, self.text_gold)
         self.screen.blit(title, (self.panel_x + 10, controls_y + 10))
         
         # Controls list based on input method
         if self.use_controller:
-            controls = [
-                "D-Pad ←→ : Move",
-                "Square : Rotate CW",
-                "Cross : Rotate CCW",
-                "D-Pad ↑ : Hard",
-                "D-Pad ↓ : Soft",
-                "Options : Pause"
-            ]
+            ctrl_section = "controls_controller"
         else:
-            controls = [
-                "← → : Move",
-                "A D : Rotate L/R",
-                "↑ : Soft Drop",
-                "↓ : Hard Drop",
-                "P : Pause",
-                "R : Restart"
-            ]
+            ctrl_section = "controls_keyboard"
+        
+        controls = [
+            localization.get(ctrl_section, "move"),
+            localization.get(ctrl_section, "rotate_cw"),
+            localization.get(ctrl_section, "rotate_ccw"),
+            localization.get(ctrl_section, "soft_drop"),
+            localization.get(ctrl_section, "hard_drop"),
+            localization.get(ctrl_section, "pause"),
+        ]
         
         y = controls_y + 40
         for control in controls:
