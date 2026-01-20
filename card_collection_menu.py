@@ -607,6 +607,12 @@ class CardCollectionMenu:
             self.screen.blit(desc_surface, (x + 10, desc_y))
             desc_y += 18
         
+        # Render piece preview for blue cards
+        if card.type == CardType.BLUE and card.piece_shape and card.piece_color:
+            piece_y = y + 72  # Position between description and bottom indicators
+            piece_color = hex_to_rgb(card.piece_color)
+            self._render_piece_on_card(card.piece_shape, piece_color, x + self.card_width // 2, piece_y)
+        
         # Selection count
         count = self.card_stats.get_selection_count(card.id)
         count_text = localization.get("collection", "times_selected").format(count=count)
@@ -643,6 +649,37 @@ class CardCollectionMenu:
             lines.append(' '.join(current_line))
         
         return lines
+    
+    def _render_piece_on_card(self, shape: List[List[int]], color: Tuple[int, int, int], 
+                               center_x: int, center_y: int) -> None:
+        """Render a tetris piece preview on the card"""
+        if not shape:
+            return
+        
+        block_size = 10  # Size of each block in the piece
+        
+        # Calculate centering
+        shape_width = len(shape[0]) * block_size
+        shape_height = len(shape) * block_size
+        
+        start_x = center_x - shape_width // 2
+        start_y = center_y - shape_height // 2
+        
+        # Draw the piece blocks
+        for row_idx, row in enumerate(shape):
+            for col_idx, cell in enumerate(row):
+                if cell:
+                    block_x = start_x + col_idx * block_size
+                    block_y = start_y + row_idx * block_size
+                    
+                    # Main block
+                    block_rect = pygame.Rect(block_x, block_y, block_size - 1, block_size - 1)
+                    pygame.draw.rect(self.screen, color, block_rect, border_radius=2)
+                    
+                    # Highlight for 3D effect
+                    highlight_color = tuple(min(255, c + 40) for c in color)
+                    highlight_rect = pygame.Rect(block_x + 1, block_y + 1, block_size - 3, 2)
+                    pygame.draw.rect(self.screen, highlight_color, highlight_rect)
     
     def _render_scroll_indicator(self) -> None:
         """Render a scroll indicator on the right side"""
